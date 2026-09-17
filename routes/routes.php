@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../models/Conexao.php';
 require_once __DIR__ . '/../models/Item.php';
 require_once __DIR__ . '/../models/Reserva.php';
 require_once __DIR__ . '/../controllers/ItemController.php';

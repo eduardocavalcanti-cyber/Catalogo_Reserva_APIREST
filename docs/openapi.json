@@ -1,0 +1,170 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Catálogo e Reserva de Livros/Jogos",
+    "version": "1.0.0",
+    "description": "API REST em PHP puro"
+  },
+  "servers": [{ "url": "http://localhost:8000", "description": "Servidor local" }],
+  "tags": [{ "name": "Itens" }, { "name": "Reservas" }],
+  "paths": {
+    "/api/itens": {
+      "get": {
+        "tags": ["Itens"],
+        "summary": "Listar itens",
+        "responses": {
+          "200": { "description": "Lista de itens", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Item" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Itens"],
+        "summary": "Criar item",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ItemInput" } } } },
+        "responses": {
+          "201": { "description": "Criado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MensagemId" } } } },
+          "400": { "description": "Validação", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } }
+        }
+      }
+    },
+    "/api/itens/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "get": {
+        "tags": ["Itens"],
+        "summary": "Buscar item",
+        "responses": {
+          "200": { "description": "Item", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Item" } } } },
+          "404": { "description": "Não encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } }
+        }
+      },
+      "put": {
+        "tags": ["Itens"],
+        "summary": "Atualizar item",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ItemUpdate" } } } },
+        "responses": {
+          "200": { "description": "Atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Mensagem" } } } },
+          "400": { "description": "Validação", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } },
+          "404": { "description": "Não encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Itens"],
+        "summary": "Excluir item",
+        "responses": {
+          "204": { "description": "Excluído" },
+          "400": { "description": "Possui reservas", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } },
+          "404": { "description": "Não encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } }
+        }
+      }
+    },
+    "/api/reservas": {
+      "get": {
+        "tags": ["Reservas"],
+        "summary": "Listar reservas",
+        "responses": {
+          "200": { "description": "Lista de reservas", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Reserva" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Reservas"],
+        "summary": "Criar reserva",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReservaInput" } } } },
+        "responses": {
+          "201": { "description": "Criado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MensagemId" } } } },
+          "400": { "description": "Validação / indisponível", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } },
+          "404": { "description": "Item não encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } }
+        }
+      }
+    },
+    "/api/reservas/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "get": {
+        "tags": ["Reservas"],
+        "summary": "Buscar reserva",
+        "responses": {
+          "200": { "description": "Reserva", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Reserva" } } } },
+          "404": { "description": "Não encontrada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } }
+        }
+      },
+      "put": {
+        "tags": ["Reservas"],
+        "summary": "Atualizar reserva",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReservaInput" } } } },
+        "responses": {
+          "200": { "description": "Atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Mensagem" } } } },
+          "400": { "description": "Validação", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } },
+          "404": { "description": "Não encontrada / Item não encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Reservas"],
+        "summary": "Excluir reserva",
+        "responses": {
+          "204": { "description": "Excluída" },
+          "404": { "description": "Não encontrada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Item": {
+        "type": "object",
+        "required": ["id", "titulo", "tipo", "autor", "ano", "disponivel"],
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "titulo": { "type": "string", "example": "Dom Casmurro" },
+          "tipo": { "type": "string", "enum": ["Livro", "Jogo"] },
+          "autor": { "type": "string", "example": "Machado de Assis" },
+          "ano": { "type": "integer", "example": 1899 },
+          "disponivel": { "type": "integer", "enum": [0, 1], "example": 1 }
+        }
+      },
+      "ItemInput": {
+        "type": "object",
+        "required": ["titulo", "tipo", "autor", "ano"],
+        "properties": {
+          "titulo": { "type": "string", "example": "Dom Casmurro" },
+          "tipo": { "type": "string", "enum": ["Livro", "Jogo"] },
+          "autor": { "type": "string", "example": "Machado de Assis" },
+          "ano": { "type": "integer", "example": 1899 }
+        }
+      },
+      "ItemUpdate": {
+        "type": "object",
+        "required": ["titulo", "tipo", "autor", "ano"],
+        "properties": {
+          "titulo": { "type": "string" },
+          "tipo": { "type": "string", "enum": ["Livro", "Jogo"] },
+          "autor": { "type": "string" },
+          "ano": { "type": "integer" },
+          "disponivel": { "type": "integer", "enum": [0, 1] }
+        }
+      },
+      "Reserva": {
+        "type": "object",
+        "required": ["id", "item_id", "nome_usuario", "data_reserva", "status"],
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "item_id": { "type": "integer", "example": 1 },
+          "item_titulo": { "type": "string", "example": "Dom Casmurro" },
+          "nome_usuario": { "type": "string", "example": "João" },
+          "data_reserva": { "type": "string", "format": "date", "example": "2026-09-17" },
+          "status": { "type": "string", "enum": ["ativa", "cancelada"] }
+        }
+      },
+      "ReservaInput": {
+        "type": "object",
+        "required": ["item_id", "nome_usuario", "data_reserva", "status"],
+        "properties": {
+          "item_id": { "type": "integer", "example": 1 },
+          "nome_usuario": { "type": "string", "example": "João" },
+          "data_reserva": { "type": "string", "format": "date", "example": "2026-09-17" },
+          "status": { "type": "string", "enum": ["ativa", "cancelada"] }
+        }
+      },
+      "Erro": { "type": "object", "required": ["erro"], "properties": { "erro": { "type": "string" } } },
+      "Mensagem": { "type": "object", "required": ["mensagem"], "properties": { "mensagem": { "type": "string" } } },
+      "MensagemId": { "type": "object", "required": ["mensagem", "id"], "properties": { "mensagem": { "type": "string" }, "id": { "type": "integer" } } }
+    }
+  }
+}
