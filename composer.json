@@ -1,0 +1,5 @@
+{
+  "name": "eduardo/catalogo-reserva-api",
+  "description": "API REST em PHP puro para catálogo e reserva de livros/jogos",
+  "require": {"php": ">=8.3", "zircote/swagger-php": "^6.0"}
+}
